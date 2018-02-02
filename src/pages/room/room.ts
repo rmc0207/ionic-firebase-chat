@@ -1,9 +1,12 @@
+import { AuthProvider } from './../../providers/auth/auth';
+import { FirebaseService } from './../../app/core/firebase.service';
 import { Component } from '@angular/core';
 import { IonicPage, NavController, NavParams } from 'ionic-angular';
 
 import { AddRoomPage } from '../add-room/add-room';
 import { HomePage } from '../home/home';
-import * as firebase from 'Firebase';
+import * as firebase from 'firebase';
+import { LoginPage } from '../login/login';
 
 @IonicPage()
 @Component({
@@ -15,10 +18,12 @@ export class RoomPage {
   rooms = [];
   ref = firebase.database().ref('chatrooms/');
 
-  constructor(public navCtrl: NavController, public navParams: NavParams) {
+  constructor(public navCtrl: NavController, public navParams: NavParams, 
+    private firebaseService: FirebaseService, public authProvider: AuthProvider) {
+      console.log(authProvider.user);
     this.ref.on('value', resp => {
       this.rooms = [];
-      this.rooms = snapshotToArray(resp);
+      this.rooms = firebaseService.snapshotToArray(resp);
     });
   }
 
@@ -28,8 +33,7 @@ export class RoomPage {
 
   joinRoom(key) {
     this.navCtrl.setRoot(HomePage, {
-      key:key,
-      nickname: this.navParams.get("nickname")
+      key:key
     });
   }
 
@@ -37,16 +41,12 @@ export class RoomPage {
     console.log('ionViewDidLoad RoomPage');
   }
 
+  logout() {
+    this.authProvider.logout();
+    this.navCtrl.setRoot(LoginPage);
+  }
+  
+  goToLogin() {
+    this.navCtrl.push(LoginPage);
+  }
 }
-
-export const snapshotToArray = snapshot => {
-  let returnArr = [];
-
-  snapshot.forEach(childSnapshot => {
-      let item = childSnapshot.val();
-      item.key = childSnapshot.key;
-      returnArr.push(item);
-  });
-
-  return returnArr;
-};

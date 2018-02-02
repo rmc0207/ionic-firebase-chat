@@ -11,9 +11,18 @@
 
 <ion-content padding>
   <ion-list>
+    <ion-item>
+        Welcome {{ (authProvider.user | async)?.email }}!
+    </ion-item>
     <ion-item *ngFor="let room of rooms">
       {{room.roomname}}
       <ion-icon name="chatboxes" item-end (click)="joinRoom(room.key)"></ion-icon>
     </ion-item>
   </ion-list>
+  <button ion-button (click)="logout()">
+    Logout
+  </button>
+  <button ion-button (click)="goToLogin()">
+    Go to login (not log out)
+  </button>
 </ion-content>
